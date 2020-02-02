@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="userMapper">
+
+<insert id ="userRegi">
+insert into users (id,pw,username) values
+(#{id},#{pw},#{username})
+</insert>
+
+
+<select id="userLogin" resultType="userDto">
+	select id, username, regdate,userLevel from users where id = #{id} and pw = #{pw}
+</select>
+
+
+</mapper>

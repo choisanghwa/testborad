@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+ <!-- 
+ 
+ 	private Integer bno;
+	private String title;
+	private String content;
+	private String writer;
+	private Date regdate;
+	private int viewcount;
+	
+ 
+  -->
+<mapper namespace="boardMapper">
+
+<insert id ="createBoard">
+insert into tbl_board (rebno,title,content,writer,id,boardpw,tbl_level,fileOne) values
+((SELECT MAX(bno)+1 FROM tbl_board rebo),#{title},#{content},#{writer},#{id},#{boardpw},#{tbl_level},#{fileOne})
+</insert>
+
+
+<select id = "nowBoard" resultType="int">
+	SELECT max(bno) from tbl_board where id <include refid="idv"></include>
+</select>
+
+<sql id ="idv">
+	<if test="id != null ">
+		=#{id}
+	</if>
+	<if test="id == null ">
+		is null
+	</if>
+</sql>
+
+
+<!-- //lastInset_id error instead -->
+
+<select id="nowBoardId" resultType="int">
+SELECT MAX(bno) FROM tbl_board  WHERE title = #{title} and content = #{content} and writer = #{writer} and boardpw = #{boardpw}
+</select>
+
+<insert id="addAttach">
+   insert into tbl_attach (fullname,bno) values
+	(#{fileOne},#{bno})
+</insert>
+
+<insert id="addAttachO">
+	<!-- <selectKey resultType="int" keyProperty="bno" order="BEFORE">
+			SELECT distinct LAST_INSERT_ID() FROM tbl_board
+		</selectKey>  -->
+<!-- insert into tbl_attach (fullName,bno) values
+	(#{fullName},#{bno}) -->
+ insert into tbl_attach (fullName,bno) values
+	(#{fullName},LAST_INSERT_ID()) 
+<!-- 		<selectKey resultType="Integer" keyProperty="bno" order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>  -->	
+</insert>
+
+
+<select id="listBoard" resultType="boardDto">
+	select tbl_level,bno, rebno,id,title, writer, viewcount, regdate from tbl_board ORDER BY regdate desc
+</select>
+ 
+<select id="readBoard" resultType="boardDto">
+	select * from tbl_board where bno = #{bno}
+</select>
+
+
+<update id="modifyBoard">
+UPDATE tbl_board SET title = #{title},content=#{content} WHERE bno = #{bno}
+</update>
+
+<delete id="delectBoard">
+	delete from tbl_board where bno = #{bno}
+</delete>
+
+
+<!-- 페이징 처리 -->
+<select id = "listPage" resultType="boardDto">
+	<![CDATA[
+		select tbl_level,bno,rebno, id,title, writer, viewcount, regdate
+		from
+		tbl_board
+		where 
+	    bno > 0 
+	    <!-- ORDER BY bno DESC,regdate desc -->
+	    ORDER BY rebno DESC, sqnbno ASC
+	    LIMIT #{page},10
+	
+	]]>
+</select>
+
+<!-- 페이징 처리 -->
+<select id = "listPageCriteria" resultType="boardDto">
+	<![CDATA[
+		select tbl_level,bno, id,title, writer, viewcount, regdate
+		from
+		tbl_board
+	
+		where bno>0
+		]]>
+		<include refid="searchIf"></include>
+		
+		<![CDATA[
+		ORDER BY rebno DESC, sqnbno ASC
+		LIMIT #{pageStart},#{perPageNum}
+		]]>
+	
+</select>
+
+
+
+<select id = "countPagin" resultType="int">
+		<![CDATA[
+		select 
+		count(bno)
+		from 
+		tbl_board
+		where
+		bno>0
+		]]>
+		<include refid="searchIf"></include>
+</select>
+
+
+
+
+
+<!-- Search -->
+<!-- 
+<select id = "listSearch" resultType="boardDto">
+		<![CDATA[
+		select *
+		from tbl_board
+		where bno>0
+		]]>
+		
+		
+		<include refid="search"></include>
+		
+		<![CDATA[
+		ORDER BY bno DESC,regdate desc
+		LIMIT #{pageStart},#{perPageNum}
+		]]>
+</select>
+
+<select id = "listSearchCount" resultType="int">
+		<![CDATA[
+		select 
+		count(bno)
+		from 
+		tbl_board
+		where
+		bno>0
+		]]>
+		<include refid="searchIf"></include>
+</select> -->
+
+<sql id ="searchIf">
+	<if test="searchType != null ">
+			<if test="searchType == 'a'.toString() ">
+				 AND( title like CONCAT('%',#{keyword},'%')  OR content like CONCAT('%',#{keyword},'%') or writer like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="searchType == 't'.toString() ">
+				 AND title like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="searchType == 'c'.toString() ">
+				AND content like CONCAT('%',#{keyword},'%')
+			</if>
+			
+			<if test="searchType == 'w'.toString() ">
+				AND writer like CONCAT('%',#{keyword},'%')
+			</if>	
+			
+			<if test="searchType == 'tn'.toString() ">
+				AND ( title like CONCAT('%',#{keyword},'%')  OR content like CONCAT('%',#{keyword},'%'))
+			</if>	
+	</if>
+</sql>
+
+
+
+
+  <insert id="reBoardCreat">
+  insert into tbl_board (rebno,sqnbno,title,content,writer,id,boardpw,tbl_level,fileOne) values
+	(#{bno},(SELECT max(sqnbno) FROM tbl_board sqn WHERE rebno = #{bno})+1,#{title},#{content},#{writer},#{id},#{boardpw},#{tbl_level},#{fileOne})
+  </insert>
+  
+
+
+
+
+
+
+</mapper>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="replyMapper">
+  <!-- private Integer rno;
+	private Integer bno;
+	private String replaytext;
+	private String replay;
+	private Date regdate; -->
+  
+  <select id="list" resultType="replyDTO">
+  
+  select * from  re_tbl where bno = #{bno}
+  order by rno desc
+  
+  </select>
+  
+  
+  <insert id="createReply">
+  insert into re_tbl (bno,replaytext,replay,reid,replaypw) values
+  (#{bno},#{replaytext},#{replay},#{reid},#{replaypw}) 
+  
+  </insert>
+  
+  <delete id="remove">
+  	delete from re_tbl where rno = #{rno}
+  </delete>
+  
+  
+<update id="upload">
+UPDATE re_tbl SET replaytext=#{replaytext} WHERE rno = #{rno}
+</update>
+  
+  
+
+  </mapper>
