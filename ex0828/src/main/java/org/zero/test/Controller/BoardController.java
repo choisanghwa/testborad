@@ -109,7 +109,7 @@ public class BoardController {
 //		logger.info("size: " + file.getSize());
 //		logger.info("contentType: " + file.getContentType());
 //		logger.info("id: " + (String) session.getAttribute("id"));
-		logger.info("확인  file.length :" + file[0].getOriginalFilename() );
+		logger.info("확인dd  file.length :" + file[0].getOriginalFilename() );
 		// file upload
 		// One file upload
 		String saveNameOr[] = new String[file.length];
